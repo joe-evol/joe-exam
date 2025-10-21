@@ -27,6 +27,9 @@ $path = $_GET['path'] ?? '';
 // Rate limiting - max 100 requests per hour per IP
 function checkRateLimit() {
     $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+    if ($ip === '127.0.0.1' || $ip === '::1') {
+        return;
+    }
     $key = 'ratelimit_' . $ip;
     $limit = 100;
     $window = 3600; // 1 hour
@@ -159,7 +162,8 @@ try {
     // GET /api.php?path=analytics
     elseif ($path === 'analytics' && $method === 'GET') {
         $date = $_GET['date'] ?? date('Y-m-d');
-        $logFile = __DIR__ . '/logs/access.log';
+        $logFile = __DIR__ . '/../logs/access.log';
+
     
         if (!file_exists($logFile)) {
             jsonResponse(['date' => $date, 'data' => []]);

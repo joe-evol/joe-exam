@@ -5,6 +5,7 @@ let currentCategory = '';
 let isLoading = false;
 var selectedFiles = [];
 var isSearching = false;
+let hasMorePages = true;
 
 
 // Load categories on page load
@@ -16,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Fetch and display categories
 function loadCategories() {
-    fetch('/api/api.php?path=categories')
+    fetch('/api/api.php?path=categories', { credentials: 'include'})
         .then(res => res.json())
         .then(categories => {
             const categoryList = document.getElementById('categoryList');
@@ -39,7 +40,8 @@ function loadCategories() {
                     this.classList.add('active');
                     currentCategory = this.dataset.category;
                     currentPage = 1;
-                    isSearching = false; // Add this line
+                    hasMorePages = true; 
+                    isSearching = false; 
                     document.getElementById('productsGrid').innerHTML = '';
                     loadProducts();
                 });
@@ -57,14 +59,16 @@ function loadCategories() {
 
 // Fetch and display products
 function loadProducts() {
-    if (isLoading) return;
+    // if (isLoading) return;
+    if (isLoading || !hasMorePages) return; // Check hasMorePages
+
     isLoading = true;
     document.getElementById('loading').classList.add('show');
     
     let url = `/api/api.php?path=products&page=${currentPage}&limit=40`;
     if (currentCategory) url += `&category=${currentCategory}`;
     
-    fetch(url)
+    fetch(url, { credentials: 'include'})
         .then(res => res.json())
         .then(data => {
             const grid = document.getElementById('productsGrid');
@@ -88,11 +92,12 @@ function loadProducts() {
             
             isLoading = false;
             document.getElementById('loading').classList.remove('show');
-            
             // If there are more pages, increment for next load
             if (currentPage < data.pages) {
                 currentPage++;
-            } 
+            } else {
+                hasMorePages = false; // No more pages to load
+            }
         });
 }
 
@@ -117,7 +122,7 @@ document.getElementById('searchInput').addEventListener('input', function(e) {
     }
     
     searchTimeout = setTimeout(() => {
-        fetch(`/api/api.php?path=products&search=${encodeURIComponent(query)}&limit=10`)
+        fetch(`/api/api.php?path=products&search=${encodeURIComponent(query)}&limit=10`, { credentials: 'include'})
             .then(res => res.json())
             .then(data => {
                 const results = document.getElementById('searchResults');
@@ -168,7 +173,7 @@ function loadProductsWithSearch(query) {
     
     let url = `/api/api.php?path=products&page=${currentPage}&limit=20&search=${encodeURIComponent(query)}`;
     
-    fetch(url)
+    fetch(url, { credentials: 'include'})
         .then(res => res.json())
         .then(data => {
             const grid = document.getElementById('productsGrid');
@@ -375,6 +380,7 @@ async function handleFormSubmit(e) {
     
     fetch('/api/api.php?path=products', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
     })
@@ -395,7 +401,7 @@ async function handleFormSubmit(e) {
 function loadAnalytics() {
     const date = document.getElementById('analyticsDate').value;
     
-    fetch(`/api/api.php?path=analytics&date=${date}`)
+    fetch(`/api/api.php?path=analytics&date=${date}`, { credentials: 'include'})
         .then(res => res.json())
         .then(data => {
             drawChart(data.data);
@@ -404,10 +410,11 @@ function loadAnalytics() {
 
 // bar chart
 function drawChart(data) {
+    // debugger
     const canvas = document.getElementById('dauChart');
     const ctx = canvas.getContext('2d');
-    
-    canvas.width = canvas.offsetWidth;
+
+    canvas.width = window.innerWidth * 0.8;
     canvas.height = 400;
     
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -417,7 +424,9 @@ function drawChart(data) {
         return;
     }
 
+    // const sampledData = data.filter((_, i) => i % 5 === 0);
     const sampledData = data.filter((_, i) => i % 60 === 0);
+
 
     const maxDau = Math.max(...sampledData.map(d => d.dau));
     const barWidth = canvas.width / sampledData.length;
@@ -430,7 +439,7 @@ function drawChart(data) {
         
         ctx.fillStyle = '#3498db';
         ctx.fillRect(x + 2, y, barWidth - 4, barHeight);
-        if (index % 4 === 0) {
+        if (index % 5 === 0) {
             ctx.fillStyle = '#333';
             ctx.font = '10px sans-serif';
             const time = item.minute.substring(11, 16); // Extract HH:MM
