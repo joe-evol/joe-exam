@@ -285,11 +285,11 @@ function setupEventListeners() {
 
 // Handle file preview
 function handleFiles(files) {
-    selectedFiles = Array.from(files); // Store the files
-    const preview = document.getElementById('imagePreview');
-    preview.innerHTML = '';
+    selectedFiles = selectedFiles.concat(Array.from(files));
     
-    selectedFiles.forEach(file => {
+    const preview = document.getElementById('imagePreview');
+    
+    Array.from(files).forEach(file => {
         if (file.type.startsWith('image/')) {
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -301,7 +301,6 @@ function handleFiles(files) {
                 `;
                 div.querySelector('.preview-remove').addEventListener('click', () => {
                     div.remove();
-                    // Remove from selectedFiles array
                     selectedFiles = selectedFiles.filter(f => f !== file);
                 });
                 preview.appendChild(div);
@@ -355,11 +354,14 @@ async function handleFormSubmit(e) {
     const files = fileInput.files;
     
     let thumbnail = 'https://via.placeholder.com/300';
+    let images = [];
+
 
     if (selectedFiles.length > 0) {
         const urls = await uploadFilesToS3(selectedFiles);
         if (urls.length > 0) {
             thumbnail = urls[0];
+            images = urls;
         }
     }
 
@@ -376,8 +378,8 @@ async function handleFormSubmit(e) {
         description: document.getElementById('productDescription').value,
         category: document.getElementById('productCategory').value,
         price: document.getElementById('productPrice').value,
-        // thumbnail: 'https://via.placeholder.com/300'
-        thumbnail: thumbnail
+        thumbnail: thumbnail,
+        images: JSON.stringify(images)
     };
     
     fetch('/api/api.php?path=products', {
@@ -392,6 +394,7 @@ async function handleFormSubmit(e) {
             document.getElementById('addProductModal').classList.remove('show');
             document.getElementById('productForm').reset();
             document.getElementById('imagePreview').innerHTML = '';
+            selectedFiles = [];
             currentPage = 1;
             document.getElementById('productsGrid').innerHTML = '';
             loadProducts();
