@@ -4,6 +4,7 @@ let currentPage = 1;
 let currentCategory = '';
 let isLoading = false;
 var selectedFiles = [];
+var isSearching = false;
 
 
 // Load categories on page load
@@ -38,6 +39,7 @@ function loadCategories() {
                     this.classList.add('active');
                     currentCategory = this.dataset.category;
                     currentPage = 1;
+                    isSearching = false; // Add this line
                     document.getElementById('productsGrid').innerHTML = '';
                     loadProducts();
                 });
@@ -89,12 +91,14 @@ function loadProducts() {
             // If there are more pages, increment for next load
             if (currentPage < data.pages) {
                 currentPage++;
-            }
+            } 
         });
 }
 
 // Infinite scroll
 window.addEventListener('scroll', function() {
+    if (isSearching) return; 
+    if (isLoading) return; // Add this check
     if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
         loadProducts();
     }
@@ -158,6 +162,7 @@ document.getElementById('searchInput').addEventListener('keypress', function(e) 
 function loadProductsWithSearch(query) {
     if (isLoading) return;
     isLoading = true;
+    isSearching = true;
     document.getElementById('loading').classList.add('show');
     
     let url = `/api.php?path=products&page=${currentPage}&limit=20&search=${encodeURIComponent(query)}`;
