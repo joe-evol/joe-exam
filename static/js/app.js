@@ -37,6 +37,9 @@ function loadCategories() {
                 item.addEventListener('click', function(e) {
                     e.preventDefault();
 
+                    document.getElementById('sidebar').classList.remove('show');
+
+
                     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
                     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
                     document.querySelector('[data-tab="products"]').classList.add('active');
