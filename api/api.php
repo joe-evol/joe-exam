@@ -142,21 +142,46 @@ try {
         if (!$data || !isset($data['title'])) {
             jsonResponse(['error' => 'Title is required'], 400);
         }
+
+        try {
+            $pdo->beginTransaction();
+
+            $stmt = $pdo->prepare("
+                INSERT INTO joe_products (title, description, category, price, thumbnail, images)
+                VALUES (:title, :description, :category, :price, :thumbnail, :images)
+            ");
+
+            $stmt->execute([
+                'title' => $data['title'],
+                'description' => $data['description'] ?? null,
+                'category' => $data['category'] ?? null,
+                'price' => $data['price'] ?? null,
+                'thumbnail' => $data['thumbnail'] ?? null,
+                'images' => $data['images'] ?? null
+            ]);
+
+            $pdo->commit();
+            jsonResponse(['success' => true, 'id' => $pdo->lastInsertId()], 201);
+
+        } catch (Exception $e) {
+            $pdo->rollBack();
+            jsonResponse(['error' => 'Failed to create product'], 500);
+        }
         
-        $stmt = $pdo->prepare("
-            INSERT INTO joe_products (title, description, category, price, thumbnail)
-            VALUES (:title, :description, :category, :price, :thumbnail)
-        ");
+        // $stmt = $pdo->prepare("
+        //     INSERT INTO joe_products (title, description, category, price, thumbnail)
+        //     VALUES (:title, :description, :category, :price, :thumbnail)
+        // ");
         
-        $stmt->execute([
-            'title' => $data['title'],
-            'description' => $data['description'] ?? null,
-            'category' => $data['category'] ?? null,
-            'price' => $data['price'] ?? null,
-            'thumbnail' => $data['thumbnail'] ?? null
-        ]);
+        // $stmt->execute([
+        //     'title' => $data['title'],
+        //     'description' => $data['description'] ?? null,
+        //     'category' => $data['category'] ?? null,
+        //     'price' => $data['price'] ?? null,
+        //     'thumbnail' => $data['thumbnail'] ?? null
+        // ]);
         
-        jsonResponse(['success' => true, 'id' => $pdo->lastInsertId()], 201);
+        // jsonResponse(['success' => true, 'id' => $pdo->lastInsertId()], 201);
     }
     
     // GET /api.php?path=analytics

@@ -395,7 +395,18 @@ async function handleFormSubmit(e) {
             document.getElementById('productForm').reset();
             document.getElementById('imagePreview').innerHTML = '';
             selectedFiles = [];
+
+            currentCategory = '';
             currentPage = 1;
+            hasMorePages = true;
+
+            document.querySelectorAll('.category-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.category === '') {
+                    item.classList.add('active');
+                }
+            });
+
             document.getElementById('productsGrid').innerHTML = '';
             loadProducts();
         }
