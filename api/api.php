@@ -8,7 +8,8 @@ if (isset($_GET['search'])) {
     error_log("Search term: " . $_GET['search']);
 }
 
-require_once 'config.php';
+// require_once '/config.php';
+require_once __DIR__ . '/../config.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     if (!isset($_SESSION['user_id'])) {

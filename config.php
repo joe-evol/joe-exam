@@ -1,7 +1,7 @@
 <?php
 
 session_start();
-require_once 'conf.inc';
+require_once 'secret.inc';
 
 function requireAuth() {
     if (!isset($_SESSION['user_id'])) {

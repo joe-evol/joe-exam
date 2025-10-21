@@ -1,6 +1,6 @@
 <?php
 // upload.php - S3 file upload handler (direct API, no SDK)
-require_once 'conf.inc';
+require_once 'secret.inc';
 
 header('Content-Type: application/json');
 

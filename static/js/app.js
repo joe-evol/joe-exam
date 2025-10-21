@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Fetch and display categories
 function loadCategories() {
-    fetch('/api.php?path=categories')
+    fetch('/api/api.php?path=categories')
         .then(res => res.json())
         .then(categories => {
             const categoryList = document.getElementById('categoryList');
@@ -61,7 +61,7 @@ function loadProducts() {
     isLoading = true;
     document.getElementById('loading').classList.add('show');
     
-    let url = `/api.php?path=products&page=${currentPage}&limit=20`;
+    let url = `/api/api.php?path=products&page=${currentPage}&limit=40`;
     if (currentCategory) url += `&category=${currentCategory}`;
     
     fetch(url)
@@ -74,6 +74,7 @@ function loadProducts() {
                 card.className = 'product-card';
                 card.innerHTML = `
                     <img src="${product.thumbnail || 'https://via.placeholder.com/300'}" 
+                        loading="lazy"
                          alt="${product.title}" class="product-image">
                     <div class="product-info">
                         <h3 class="product-title">${product.title}</h3>
@@ -116,7 +117,7 @@ document.getElementById('searchInput').addEventListener('input', function(e) {
     }
     
     searchTimeout = setTimeout(() => {
-        fetch(`/api.php?path=products&search=${encodeURIComponent(query)}&limit=10`)
+        fetch(`/api/api.php?path=products&search=${encodeURIComponent(query)}&limit=10`)
             .then(res => res.json())
             .then(data => {
                 const results = document.getElementById('searchResults');
@@ -165,7 +166,7 @@ function loadProductsWithSearch(query) {
     isSearching = true;
     document.getElementById('loading').classList.add('show');
     
-    let url = `/api.php?path=products&page=${currentPage}&limit=20&search=${encodeURIComponent(query)}`;
+    let url = `/api/api.php?path=products&page=${currentPage}&limit=20&search=${encodeURIComponent(query)}`;
     
     fetch(url)
         .then(res => res.json())
@@ -177,6 +178,7 @@ function loadProductsWithSearch(query) {
                 card.className = 'product-card';
                 card.innerHTML = `
                     <img src="${product.thumbnail || 'https://via.placeholder.com/300'}" 
+                        loading="lazy"
                          alt="${product.title}" class="product-image">
                     <div class="product-info">
                         <h3 class="product-title">${product.title}</h3>
@@ -371,7 +373,7 @@ async function handleFormSubmit(e) {
         thumbnail: thumbnail
     };
     
-    fetch('/api.php?path=products', {
+    fetch('/api/api.php?path=products', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -393,7 +395,7 @@ async function handleFormSubmit(e) {
 function loadAnalytics() {
     const date = document.getElementById('analyticsDate').value;
     
-    fetch(`/api.php?path=analytics&date=${date}`)
+    fetch(`/api/api.php?path=analytics&date=${date}`)
         .then(res => res.json())
         .then(data => {
             drawChart(data.data);

@@ -2,4 +2,4 @@ uploads/*
 !uploads/.gitkeep
 .DS_Store
 logs/*.log
-conf.inc
+secret.inc

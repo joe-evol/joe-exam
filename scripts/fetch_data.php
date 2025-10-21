@@ -1,12 +1,13 @@
 <?php
 // fetch_data.php - Minimal data import from dummyjson.com
+require_once '/../secret.inc';
 
 $dbConfig = [
-    'host' => 'quiz-db.bonp.me',
-    'port' => 18650,
-    'user' => 'quiz',
-    'pass' => 'U!CHyJQK%8f0zK8&%507OZ7$r0z*y#&b',
-    'db' => 'quiz'
+    'host' => DB_HOST,
+    'port' => DB_PORT,
+    'user' => DB_USER,
+    'pass' => DB_PASS,
+    'db' => DB_NAME
 ];
 
 try {
