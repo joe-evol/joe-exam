@@ -139,9 +139,11 @@ document.getElementById('searchInput').addEventListener('input', function(e) {
                             document.getElementById('searchInput').value = product.title;
                             results.classList.remove('show');
                             currentPage = 1;
-                            currentCategory = product.category;
+                            currentCategory = ''; // Clear category
+
                             document.getElementById('productsGrid').innerHTML = '';
-                            loadProducts();
+                            // loadProducts();
+                            loadProductsWithSearch(product.title); // Search by title instead
                         });
                         results.appendChild(item);
                     });
