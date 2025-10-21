@@ -36,6 +36,12 @@ function loadCategories() {
             document.querySelectorAll('.category-item').forEach(item => {
                 item.addEventListener('click', function(e) {
                     e.preventDefault();
+
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    document.querySelector('[data-tab="products"]').classList.add('active');
+                    document.getElementById('productsTab').classList.add('active');
+
                     document.querySelectorAll('.category-item').forEach(i => i.classList.remove('active'));
                     this.classList.add('active');
                     currentCategory = this.dataset.category;
